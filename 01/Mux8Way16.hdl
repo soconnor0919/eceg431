@@ -21,7 +21,7 @@ CHIP Mux8Way16 {
 
     PARTS:
     // Use two Mux4Way16 gates and one Mux16 to select from 8 inputs
-    Mux4Way16(a=a, b=b, c=c, d=d, sel=sel[0..1], out=mux4wayABCD);
-    Mux4Way16(a=e, b=f, c=g, d=h, sel=sel[0..1], out=mux4wayEFGH);
-    Mux16(a=mux4wayABCD, b=mux4wayEFGH, sel=sel[2], out=out);
+    Mux4Way16(a=a, b=b, c=c, d=d, sel=sel[0..1], out=tmp1);
+    Mux4Way16(a=e, b=f, c=g, d=h, sel=sel[0..1], out=tmp2);
+    Mux16(a=tmp1, b=tmp2, sel=sel[2], out=out);
 }

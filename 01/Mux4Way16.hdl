@@ -15,7 +15,7 @@ CHIP Mux4Way16 {
 
     PARTS:
     // Use two levels of Mux16: first level selects between pairs, second level selects final output
-    Mux16(a=a, b=b, sel=sel[0], out=muxAB);
-    Mux16(a=c, b=d, sel=sel[0], out=muxCD);
-    Mux16(a=muxAB, b=muxCD, sel=sel[1], out=out);
+    Mux16(a=a, b=b, sel=sel[0], out=tmp1);
+    Mux16(a=c, b=d, sel=sel[0], out=tmp2);
+    Mux16(a=tmp1, b=tmp2, sel=sel[1], out=out);
 }

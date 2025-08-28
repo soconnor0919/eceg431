@@ -12,9 +12,9 @@ CHIP Xor {
 
     PARTS:
     // Xor(a,b) = Or(And(a, Not(b)), And(Not(a), b))
-    Not(in=a, out=notA);
-    Not(in=b, out=notB);
-    And(a=a, b=notB, out=aAndNotB);
-    And(a=notA, b=b, out=notAAndB);
-    Or(a=aAndNotB, b=notAAndB, out=out);
+    Not(in=a, out=tmp1);
+    Not(in=b, out=tmp2);
+    And(a=a, b=tmp2, out=tmp3);
+    And(a=tmp1, b=b, out=tmp4);
+    Or(a=tmp3, b=tmp4, out=out);
 }
