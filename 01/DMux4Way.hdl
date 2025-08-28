@@ -14,5 +14,8 @@ CHIP DMux4Way {
     OUT a, b, c, d;
 
     PARTS:
-    //// Replace this comment with your code.
+    // Use two levels of DMux: first level splits by sel[1], second level splits by sel[0]
+    DMux(in=in, sel=sel[1], a=dmuxAB, b=dmuxCD);
+    DMux(in=dmuxAB, sel=sel[0], a=a, b=b);
+    DMux(in=dmuxCD, sel=sel[0], a=c, b=d);
 }

@@ -18,5 +18,8 @@ CHIP DMux8Way {
     OUT a, b, c, d, e, f, g, h;
 
     PARTS:
-    //// Replace this comment with your code.
+    // Use one DMux and two DMux4Way gates: first split by sel[2], then each half by sel[0..1]
+    DMux(in=in, sel=sel[2], a=dmuxABCD, b=dmuxEFGH);
+    DMux4Way(in=dmuxABCD, sel=sel[0..1], a=a, b=b, c=c, d=d);
+    DMux4Way(in=dmuxEFGH, sel=sel[0..1], a=e, b=f, c=g, d=h);
 }
