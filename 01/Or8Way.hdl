@@ -11,7 +11,7 @@ CHIP Or8Way {
     OUT out;
 
     PARTS:
-    // Chain Or gates to combine all 8 inputs
+    // Chain Or gates
     Or(a=in[0], b=in[1], out=tmp1);
     Or(a=in[2], b=in[3], out=tmp2);
     Or(a=in[4], b=in[5], out=tmp3);
