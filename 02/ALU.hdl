@@ -27,19 +27,49 @@
 // if (no == 1) sets out = !out   // bitwise not
 
 CHIP ALU {
-    IN  
-        x[16], y[16],  // 16-bit inputs        
+    IN
+        x[16], y[16],  // 16-bit inputs
         zx, // zero the x input?
         nx, // negate the x input?
         zy, // zero the y input?
         ny, // negate the y input?
         f,  // compute (out = x + y) or (out = x & y)?
         no; // negate the out output?
-    OUT 
+    OUT
         out[16], // 16-bit output
         zr,      // if (out == 0) equals 1, else 0
         ng;      // if (out < 0)  equals 1, else 0
 
     PARTS:
-    //// Replace this comment with your code.
+    // Step 1: Handle zx (zero x)
+    Mux16(a=x, b=false, sel=zx, out=x1);
+
+    // Step 2: Handle nx (negate x)
+    Not16(in=x1, out=notx1);
+    Mux16(a=x1, b=notx1, sel=nx, out=x2);
+
+    // Step 3: Handle zy (zero y)
+    Mux16(a=y, b=false, sel=zy, out=y1);
+
+    // Step 4: Handle ny (negate y)
+    Not16(in=y1, out=noty1);
+    Mux16(a=y1, b=noty1, sel=ny, out=y2);
+
+    // Step 5: Handle f (function: add or and)
+    Add16(a=x2, b=y2, out=addout);
+    And16(a=x2, b=y2, out=andout);
+    Mux16(a=andout, b=addout, sel=f, out=fout);
+
+    // Step 6: Handle no (negate output)
+    Not16(in=fout, out=notfout);
+    Mux16(a=fout, b=notfout, sel=no, out=out, out=finalout);
+
+    // Step 7: Compute zr (zero flag)
+    Or8Way(in=finalout[0..7], out=tmp1);
+    Or8Way(in=finalout[8..15], out=tmp2);
+    Or(a=tmp1, b=tmp2, out=notzr);
+    Not(in=notzr, out=zr);
+
+    // Step 8: Compute ng (negative flag)
+    And(a=finalout[15], b=true, out=ng);
 }
