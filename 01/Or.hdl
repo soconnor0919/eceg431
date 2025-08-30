@@ -11,7 +11,7 @@ CHIP Or {
     OUT out;
 
     PARTS:
-    // De Morgan's law
+    // Or = Not(And(Not(a), Not(b)))
     Not(in=a, out=tmp1);
     Not(in=b, out=tmp2);
     And(a=tmp1, b=tmp2, out=tmp3);
