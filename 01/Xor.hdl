@@ -11,7 +11,6 @@ CHIP Xor {
     OUT out;
 
     PARTS:
-    // Xor = (a AND !b) OR (!a AND b)
     Not(in=a, out=tmp1);
     Not(in=b, out=tmp2);
     And(a=a, b=tmp2, out=tmp3);

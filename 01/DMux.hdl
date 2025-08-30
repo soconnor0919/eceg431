@@ -12,7 +12,6 @@ CHIP DMux {
     OUT a, b;
 
     PARTS:
-    // sel=0 sends to a, sel=1 sends to b
     Not(in=sel, out=tmp);
     And(a=in, b=tmp, out=a);
     And(a=in, b=sel, out=b);

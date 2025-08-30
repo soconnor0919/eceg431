@@ -11,7 +11,6 @@ CHIP Mux {
     OUT out;
 
     PARTS:
-    // sel=0 picks a, sel=1 picks b
     Not(in=sel, out=tmp1);
     And(a=a, b=tmp1, out=tmp2);
     And(a=b, b=sel, out=tmp3);
