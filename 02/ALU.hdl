@@ -55,7 +55,8 @@ CHIP ALU {
     Not16(in=y1, out=noty1);
     Mux16(a=y1, b=noty1, sel=ny, out=y2);
 
-    // handle f (add or and)
+    // handle f (+ or &)
+    // do both ops here, is this wasteful? otherwise we run an or, but then we have to "predict"
     Add16(a=x2, b=y2, out=addout);
     And16(a=x2, b=y2, out=andout);
     Mux16(a=andout, b=addout, sel=f, out=fout);
