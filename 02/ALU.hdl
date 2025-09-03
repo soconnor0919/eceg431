@@ -66,9 +66,13 @@ CHIP ALU {
     Mux16(a=fout, b=notfout, sel=no, out=out, out[0..7]=outLow, out[8..15]=outHigh, out[15]=sign);
 
     // compute zr (zero flag)
+    // check if any bits in low 8 are set
     Or8Way(in=outLow, out=tmp1);
+    // check if any bits in high 8 are set
     Or8Way(in=outHigh, out=tmp2);
+    // combine both halves (true if any bit is set)
     Or(a=tmp1, b=tmp2, out=notzr);
+    // zr = true if no bits are set (output is zero)
     Not(in=notzr, out=zr);
 
     // compute ng (negative flag)
