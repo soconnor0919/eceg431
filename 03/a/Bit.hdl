@@ -13,5 +13,8 @@ CHIP Bit {
     OUT out;
 
     PARTS:
-    //// Replace this comment with your code.
+    // choose new input or current stored value
+    Mux(a=dffOut, b=in, sel=load, out=muxOut);
+    // DFF (new): hold val
+    DFF(in=muxOut, out=out, out=dffOut);
 }

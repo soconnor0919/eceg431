@@ -12,7 +12,22 @@
 CHIP PC {
     IN in[16],inc, load, reset;
     OUT out[16];
-    
+
     PARTS:
-    //// Replace this comment with your code.
+    // inc current value
+    Inc16(in=regOut, out=incOut);
+
+    // choose current or inc'd val (based on inc)
+    Mux16(a=regOut, b=incOut, sel=inc, out=postInc);
+    // choose ^ vs input (based on load)
+    Mux16(a=postInc, b=in, sel=load, out=postLoad);
+    // choose ^ vs zero (based on reset)
+    Mux16(a=postLoad, b=false, sel=reset, out=nextVal);
+
+    // load register if any control signal is active
+    Or(a=reset, b=load, out=resetOrLoad);
+    Or(a=resetOrLoad, b=inc, out=shouldLoad);
+
+    // stores state
+    Register(in=nextVal, load=shouldLoad, out=regOut, out=out);
 }
