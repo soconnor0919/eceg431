@@ -11,7 +11,10 @@ CHIP FullAdder {
         carry;   // Left bit of a + b + c
 
     PARTS:
+    // add first two inputs
     HalfAdder(a=a, b=b, sum=absum, carry=c0);
+    // add third input to partial sum
     HalfAdder(a=absum, b=c, sum=sum, carry=c1);
+    // combine both carry bits
     Or(a=c0, b=c1, out=carry);
 }
