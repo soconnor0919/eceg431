@@ -11,8 +11,12 @@ CHIP Mux {
     OUT out;
 
     PARTS:
-    Not(in=sel, out=tmp1);
-    And(a=a, b=tmp1, out=tmp2);
-    And(a=b, b=sel, out=tmp3);
-    Or(a=tmp2, b=tmp3, out=out);
+    // invert selector
+    Not(in=sel, out=notSel);
+    // when sel=0: aPath gets a
+    And(a=a, b=notSel, out=aPath);
+    // when sel=1: bPath gets b
+    And(a=b, b=sel, out=bPath);
+    // combine both paths
+    Or(a=aPath, b=bPath, out=out);
 }

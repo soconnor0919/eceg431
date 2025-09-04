@@ -13,7 +13,6 @@ CHIP Off {
     OUT out;
 
     PARTS:
-    // Put your code here:
-    // Nand(a=true, b=false, out=out);  // old
+    // always output false
     Nand(a=true, b=true, out=out);
 }

@@ -14,7 +14,9 @@ CHIP DMux4Way {
     OUT a, b, c, d;
 
     PARTS:
-    DMux(in=in, sel=sel[1], a=tmp1, b=tmp2);
-    DMux(in=tmp1, sel=sel[0], a=a, b=b);
-    DMux(in=tmp2, sel=sel[0], a=c, b=d);
+    // sel[1] split in to two groups
+    DMux(in=in, sel=sel[1], a=lowGroup, b=highGroup);
+    // sel[0] split each group to out
+    DMux(in=lowGroup, sel=sel[0], a=a, b=b);
+    DMux(in=highGroup, sel=sel[0], a=c, b=d);
 }

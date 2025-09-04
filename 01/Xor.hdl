@@ -11,9 +11,13 @@ CHIP Xor {
     OUT out;
 
     PARTS:
-    Not(in=a, out=tmp1);
-    Not(in=b, out=tmp2);
-    And(a=a, b=tmp2, out=tmp3);
-    And(a=tmp1, b=b, out=tmp4);
-    Or(a=tmp3, b=tmp4, out=out);
+    // invert both inputs
+    Not(in=a, out=notA);
+    Not(in=b, out=notB);
+    // a and not b path
+    And(a=a, b=notB, out=aPath);
+    // not a and b path
+    And(a=notA, b=b, out=bPath);
+    // combine both paths
+    Or(a=aPath, b=bPath, out=out);
 }

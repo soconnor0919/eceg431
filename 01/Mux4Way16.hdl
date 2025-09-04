@@ -14,7 +14,9 @@ CHIP Mux4Way16 {
     OUT out[16];
 
     PARTS:
-    Mux16(a=a, b=b, sel=sel[0], out=tmp1);
-    Mux16(a=c, b=d, sel=sel[0], out=tmp2);
-    Mux16(a=tmp1, b=tmp2, sel=sel[1], out=out);
+    // sel[0] pick from each group
+    Mux16(a=a, b=b, sel=sel[0], out=lowGroup); // group ab
+    Mux16(a=c, b=d, sel=sel[0], out=highGroup); // group cd
+    // sel[1] pick which group
+    Mux16(a=lowGroup, b=highGroup, sel=sel[1], out=out);
 }
