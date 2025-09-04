@@ -13,7 +13,7 @@ CHIP RAM64 {
     OUT out[16];
 
     PARTS:
-    // find which RAM8 to load by address (from high three bits)
+    // send load to correct RAM8 (high 3 bits)
     DMux8Way(in=load, sel=address[3..5], a=load0, b=load1, c=load2, d=load3, e=load4, f=load5, g=load6, h=load7);
 
     // 8 RAM8 chips (low 3 bits select register within each)
@@ -26,6 +26,6 @@ CHIP RAM64 {
     RAM8(in=in, load=load6, address=address[0..2], out=out6);
     RAM8(in=in, load=load7, address=address[0..2], out=out7);
 
-    // select which RAM8 output to send
+    // select out from correct RAM8
     Mux8Way16(a=out0, b=out1, c=out2, d=out3, e=out4, f=out5, g=out6, h=out7, sel=address[3..5], out=out);
 }

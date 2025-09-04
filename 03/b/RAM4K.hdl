@@ -13,7 +13,7 @@ CHIP RAM4K {
     OUT out[16];
 
     PARTS:
-    // find which RAM512 to load by address (from high three bits)
+    // send load to correct RAM512 (high 3 bits)
     DMux8Way(in=load, sel=address[9..11], a=load0, b=load1, c=load2, d=load3, e=load4, f=load5, g=load6, h=load7);
 
     // 8 RAM512 chips (low 9 bits select register within each)
@@ -26,6 +26,6 @@ CHIP RAM4K {
     RAM512(in=in, load=load6, address=address[0..8], out=out6);
     RAM512(in=in, load=load7, address=address[0..8], out=out7);
 
-    // select which RAM512 output to send
+    // select out from correct RAM512
     Mux8Way16(a=out0, b=out1, c=out2, d=out3, e=out4, f=out5, g=out6, h=out7, sel=address[9..11], out=out);
 }

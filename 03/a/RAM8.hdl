@@ -13,7 +13,7 @@ CHIP RAM8 {
     OUT out[16];
 
     PARTS:
-    // find which register to load by address
+    // send load to correct register
     DMux8Way(in=load, sel=address, a=load0, b=load1, c=load2, d=load3, e=load4, f=load5, g=load6, h=load7);
 
     // 8 registers to store data
@@ -26,6 +26,6 @@ CHIP RAM8 {
     Register(in=in, load=load6, out=out6);
     Register(in=in, load=load7, out=out7);
 
-    // select which registers output to send
+    // select out from correct register
     Mux8Way16(a=out0, b=out1, c=out2, d=out3, e=out4, f=out5, g=out6, h=out7, sel=address, out=out);
 }

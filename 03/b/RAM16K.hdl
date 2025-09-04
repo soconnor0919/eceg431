@@ -13,7 +13,7 @@ CHIP RAM16K {
     OUT out[16];
 
     PARTS:
-    // find which RAM4K to load by address (from high two bits)
+    // send load to correct RAM4K (high 2 bits)
     DMux4Way(in=load, sel=address[12..13], a=load0, b=load1, c=load2, d=load3);
 
     // 4 RAM4K chips (low 12 bits select register within each)
@@ -22,6 +22,6 @@ CHIP RAM16K {
     RAM4K(in=in, load=load2, address=address[0..11], out=out2);
     RAM4K(in=in, load=load3, address=address[0..11], out=out3);
 
-    // select which RAM4K output to send
+    // select out from correct RAM4K
     Mux4Way16(a=out0, b=out1, c=out2, d=out3, sel=address[12..13], out=out);
 }
