@@ -15,7 +15,7 @@
 
 (LOOP) // main loop
     // check kb input
-    @KBD // sel kb reg
+    @KBD // sel kb
     D=M // load kb value to data
     @FILL_BLACK // sel fill black
     D;JNE // jump if key pressed (jump not equal? non-zero)

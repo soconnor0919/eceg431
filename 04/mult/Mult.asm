@@ -7,7 +7,10 @@
 // (R0, R1, R2 refer to RAM[0], RAM[1], and RAM[2], respectively.)
 // The algorithm is based on repetitive addition.
 
-// excuse excessive comments here..
+// excuse excessive comments here.. this is how I did asm in 306.
+// to multiply, we add r0 to r2, r1 times.
+// after each cycle (addition), we decrement r1.
+// when r1 is zero, then we're done.
 
     // init r2 to 0
     @2 // sel r2
@@ -25,8 +28,8 @@
     @2 // sel r2
     D=M // load r2 to data
     @0 // sel r0
-    D=D+M // add r0 to r2 (r2 in mem, r0 in data)
-    @2 // sel r2
+    D=D+M // add r0 to r2 (r2 in data, r0 in mem)
+    @2 // sel r2 again
     M=D // store result in r2
 
     // r1 -= 1 (decrement)
