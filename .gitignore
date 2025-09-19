@@ -1,3 +1,6 @@
+# nand2tetris source files
+nand2tetris/
+
 # Compiled outputs
 *.hack
 *.out
