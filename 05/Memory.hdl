@@ -4,19 +4,19 @@
 // File name: projects/5/Memory.hdl
 /**
  * The complete address space of the Hack computer's memory,
- * including RAM and memory-mapped I/O. 
+ * including RAM and memory-mapped I/O.
  * The chip facilitates read and write operations, as follows:
  *     Read:  out(t) = Memory[address(t)](t)
  *     Write: if load(t-1) then Memory[address(t-1)](t) = in(t-1)
- * In words: the chip always outputs the value stored at the memory 
- * location specified by address. If load=1, the in value is loaded 
- * into the memory location specified by address. This value becomes 
+ * In words: the chip always outputs the value stored at the memory
+ * location specified by address. If load=1, the in value is loaded
+ * into the memory location specified by address. This value becomes
  * available through the out output from the next time step onward.
  * Address space rules:
- * Only the upper 16K+8K+1 words of the Memory chip are used. 
- * Access to address>0x6000 is invalid. Access to any address in 
- * the range 0x4000-0x5FFF results in accessing the screen memory 
- * map. Access to address 0x6000 results in accessing the keyboard 
+ * Only the upper 16K+8K+1 words of the Memory chip are used.
+ * Access to address>0x6000 is invalid. Access to any address in
+ * the range 0x4000-0x5FFF results in accessing the screen memory
+ * map. Access to address 0x6000 results in accessing the keyboard
  * memory map. The behavior in these addresses is described in the Screen
  * and Keyboard chip specifications given in the lectures and the book.
  */
@@ -25,5 +25,37 @@ CHIP Memory {
     OUT out[16];
 
     PARTS:
-	//// Replace this comment with your code.
+    // Memory = RAM16K + Screen + Keyboard (using address decoding)
+    // step 1: decode high address bits to pick component
+    // step 2: route load signal to correct component
+    // step 3: select output from correct component
+    //
+    // addr map from c5 reading (for reference, duh):
+    // 0x0000-0x3FFF: RAM16K (address[14]=0)
+    // 0x4000-0x5FFF: Screen (address[14]=1, address[13]=0)
+    // 0x6000: Keyboard (address[14]=1, address[13]=1)
+    // address[14] choose RAM vs I/O
+    // address[13] choose screen vs kb when I/O
+
+    // STEP 1
+    // split address to selectors
+    Not(in=address[14], out=ramSel); // ramSel = 1 when address[14] = 0 (RAM range)
+    And(a=address[14], b=address[13], out=kbSel); // kbSel = 1 when both bits = 1 (kb address)
+    Not(in=address[13], out=notkb); // invert address[13] for screen selection
+    And(a=address[14], b=notkb, out=screenSel); // screenSel = 1 when address[14]=1, address[13]=0
+
+    // STEP 2
+    // send load to correct component
+    And(a=load, b=ramSel, out=ramLoad); // ramLoad = load when accessing RAM
+    And(a=load, b=screenSel, out=screenLoad); // screenLoad = load when accessing screen
+
+    // mem components
+    RAM16K(in=in, load=ramLoad, address=address[0..13], out=ramOut); // 16K RAM uses 14 addr bits
+    Screen(in=in, load=screenLoad, address=address[0..12], out=screenOut); // screen uses 13 addr bits
+    Keyboard(out=kbOut); // kb is ro, no load/addr
+
+    // STEP 3
+    // pick correct out
+    Mux16(a=screenOut, b=kbOut, sel=kbSel, out=ioOut); // pick screen or kb out
+    Mux16(a=ramOut, b=ioOut, sel=address[14], out=out); // pick RAM or I/O out
 }

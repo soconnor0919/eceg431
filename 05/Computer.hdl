@@ -18,5 +18,13 @@ CHIP Computer {
     IN reset;
 
     PARTS:
-    //// Replace this comment with your code.
+    // ROM32K provides instructions to CPU
+    // find where PC points to, output instruction
+    ROM32K(address=pc, out=instruction);
+
+    // CPU executes instructions and manages data flow
+    CPU(inM=memOut, instruction=instruction, reset=reset, outM=outM, writeM=writeM, addressM=addressM, pc=pc);
+
+    // memory does storage and IO
+    Memory(in=outM, load=writeM, address=addressM, out=memOut);
 }

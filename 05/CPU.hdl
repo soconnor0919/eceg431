@@ -27,10 +27,75 @@ CHIP CPU {
                          // the current program (reset==0).
 
     OUT outM[16],        // M value output
-        writeM,          // Write to M? 
+        writeM,          // Write to M?
         addressM[15],    // Address in data memory (of M)
         pc[15];          // address of next instruction
 
     PARTS:
-	//// Replace this comment with your code.
+    // CPU implements Hack machine language from book c4/c5
+    // step 1: decode instruction type (addr instruction "A" vs compute instruction "C")
+    // step 2: handle A reg load and ALU input sel
+    // step 3: handle D reg and ALU comp
+    // step 4: handle mem write and jump logic
+    // step 5: update PC
+    //
+    // Instruction formats (for reference, duh):
+    // A-instruction: 0vvvvvvvvvvvvvvv (load 15-bit value into A)
+    // C-instruction: 111ACCCCCCDDDJJJ
+    //   A = ALU input sel (0=A, 1=M)
+    //   CCCCCC = ALU control bits
+    //   DDD = destination (A=bit5, D=bit4, M=bit3)
+    //   JJJ = jump condition (bit2=j(ump)l(ess)t(han), bit1=j(ump)eq(ual), bit0=j(ump)g(reater)t(han))
+
+    // STEP 1
+    // decode instruction type
+    Not(in=instruction[15], out=aInstr); // aInstr = 1 when instruction[15] = 0
+    Not(in=aInstr, out=cInstr); // cInstr = 1 when instruction[15] = 1
+
+    // STEP 2
+    // pick A reg input (instruction or ALU out)
+    Mux16(a=instruction, b=aluOut, sel=cInstr, out=aRegIn); // A-instr uses instruction, C-instr uses ALU
+
+    // load A reg if A-instruction or dest A
+    Or(a=aInstr, b=instruction[5], out=loadA); // load A if A-instr or C-instr with A dest
+    ARegister(in=aRegIn, load=loadA, out=aRegOut); // A reg stores addr/value
+
+    // pick ALU y input (A reg or M)
+    Mux16(a=aRegOut, b=inM, sel=instruction[12], out=aluY); // instruction[12] picks A vs M for ALU
+
+    // STEP 3
+    // load D reg if C-instruction with dest D
+    And(a=cInstr, b=instruction[4], out=loadD); // loadD = 1 when C-instr and dest D
+    DRegister(in=aluOut, load=loadD, out=dRegOut); // D reg stores data
+
+    // compute ALU operation
+    ALU(x=dRegOut, y=aluY, zx=instruction[11], nx=instruction[10], // ALU control from instruction[11..6]
+        zy=instruction[9], ny=instruction[8], f=instruction[7],
+        no=instruction[6], out=aluOut, zr=zr, ng=ng);
+
+    // STEP 4
+    // writeM set if C-instruction with dest M
+    And(a=cInstr, b=instruction[3], out=writeM); // writeM = 1 when C-instr and dest M
+
+    // compute jump conditions
+    Not(in=zr, out=notZr);                         // notZr = 1 when ALU out is not zero
+    Not(in=ng, out=notNg);                         // notNg = 1 when ALU out is not negative
+    And(a=notZr, b=notNg, out=pos);                // pos = 1 when ALU out is positive
+
+    And(a=instruction[2], b=ng, out=jlt);          // jlt = 1 when jump if less than and ALU < 0
+    And(a=instruction[1], b=zr, out=jeq);          // jeq = 1 when jump if equal and ALU = 0
+    And(a=instruction[0], b=pos, out=jgt);         // jgt = 1 when jump if greater and ALU > 0
+
+    Or(a=jlt, b=jeq, out=jle);                     // combine jlt and jeq
+    Or(a=jle, b=jgt, out=jump);                    // combine all jump conditions
+    And(a=cInstr, b=jump, out=pcLoad);             // only jump on C-instructions
+
+    // STEP 5
+    // program counter
+    PC(in=aRegOut, load=pcLoad, inc=true, reset=reset, out[0..14]=pc);  // PC jumps to A reg or increments
+
+    // OUT
+    // connect outputs
+    Or16(a=false, b=aluOut, out=outM);             // outM gets ALU output
+    Or16(a=false, b=aRegOut, out[0..14]=addressM); // addressM gets A register (15 bits)
 }
