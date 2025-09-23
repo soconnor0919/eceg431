@@ -1,0 +1,12 @@
+# ynnub.txt
+# this is a comment
+# Ignore this: bunny
+bunny bunny bunny bunny
+bunny
+bunny
+# bunny bunny bunny
+bunny # bunny
+rabbit
+bunn y
+
+I think its 7

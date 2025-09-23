@@ -1,0 +1,17 @@
+# This is a comment line.
+# Anything after the "#" should
+# be ignored.
+# bunny
+# This is the second test.
+bunny
+The output for this file should not be 1.
+It shoud be 4.
+bun # ny bunny #
+ . bunny .
+. bunny .
+hare
+. hare .
+rabbit #bunny
+bunn y
+rabbits
+ bunny

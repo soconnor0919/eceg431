@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2025-09-22 Mon 10:04 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Project 5.5 Assignment</title>
+<meta name="author" content="Stewart Thomas" />
+<meta name="description" content="An overview of the use of Python classes for reading data form a text file" />
+<meta name="keywords" content="python, classes, object oriented, trolling is a art" />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/css/readtheorg.css"/>
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/css/code-copy.css"/>
+<link rel="stylesheet" type="text/css" href="src/readtheorg_theme/css/search.css"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/js/search.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/js/readtheorg.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/js/code-copy.js"></script>
+<style>pre.src{background:#343131;color:white;} </style>
+<script>
+// @license magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&amp;dn=gpl-3.0.txt GPL-v3-or-Later
+     function CodeHighlightOn(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.add("code-highlighted");
+         target.classList.add("code-highlighted");
+       }
+     }
+     function CodeHighlightOff(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.remove("code-highlighted");
+         target.classList.remove("code-highlighted");
+       }
+     }
+// @license-end
+</script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Project 5.5 Assignment</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgbe7ef45">1. Videos to watch</a></li>
+<li><a href="#org483f9e8">2. Getting a Linux GUI going &#x2026; if you want</a></li>
+<li><a href="#org52f1d7d">3. Assignment</a>
+<ul>
+<li><a href="#org3200871">3.1. Part 1&#x2014;Single File</a></li>
+</ul>
+</li>
+<li><a href="#org2bbc288">4. Second part</a></li>
+<li><a href="#org575bd5f">5. File Locations</a></li>
+<li><a href="#org17d17de">6. ZIP FILE CONTENTS</a></li>
+</ul>
+</div>
+</div>
+
+
+
+<div id="outline-container-orgbe7ef45" class="outline-2">
+<h2 id="orgbe7ef45"><span class="section-number-2">1.</span> Videos to watch</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Links to videos that you may find useful
+</p>
+
+<ul class="org-ul">
+<li><p>
+<a href="https://www.youtube.com/watch?v=3ewgjqL9fHc">CLI and Python basics</a>
+</p>
+
+<p>
+This shows some of file access basics and terminal access. As long as you are able to access a shell or terminal and launch python with command line options, then you should be fine. See the next section for the <i>FastX</i> links. I have requested that each of you have access. The GNOME interface you will see is very slightly different, but the general topics are the same.
+</p></li>
+
+<li><p>
+<a href="https://www.youtube.com/watch?v=nY5zb7PPRpI">Object Oriented Text Processing</a>
+</p>
+
+<p>
+Probably the most relevant item for getting started doing things most related to this activity.
+</p></li>
+
+<li><p>
+<a href="https://www.youtube.com/watch?v=xsJTNOZXzBc">Directory Access</a>
+</p>
+
+<p>
+Another look at directory access and going through all files in a directory from within a program. This is typically a confusing item students.
+</p></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org483f9e8" class="outline-2">
+<h2 id="org483f9e8"><span class="section-number-2">2.</span> Getting a Linux GUI going &#x2026; if you want</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+This piece is presented in class. You are able to access a Linux GUI through a web browser. This is helpful to test to ensure that our code will work on both your own machine (which may be Windows or Mac based) as well as another POSIX environment like a Linux filesystem.
+</p>
+
+<p>
+We will be doing some basic processing with the CLI. For now, let&rsquo;s try it on a Linux machine. You can figure out how to get VSCode setup to work for you with a command line interface later.
+</p>
+
+<p>
+We will use the FastX web-based interface. Bucknell has some information at this link: <a href="https://bucknell.teamdynamix.com/TDClient/40/LIT/KB/ArticleDet?ID=274">Bucknell LIT Info</a>
+</p>
+
+<p>
+Or just use one of these:
+</p>
+<ul class="org-ul">
+<li><a href="https://linuxremote1.bucknell.edu:3300/">https://linuxremote1.bucknell.edu:3300</a></li>
+<li><a href="https://linuxremote1.bucknell.edu:3300/">https://linuxremote2.bucknell.edu:3300</a></li>
+<li><a href="https://linuxremote3.bucknell.edu:3300/">https://linuxremote3.bucknell.edu:3300</a></li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-org52f1d7d" class="outline-2">
+<h2 id="org52f1d7d"><span class="section-number-2">3.</span> Assignment</h2>
+<div class="outline-text-2" id="text-3">
+<div class="org-center">
+<p>
+bunny
+</p>
+</div>
+
+<p>
+Your goal is to call your program and ask have it count the number of times &ldquo;bunny&rdquo; occurs in a text file. The file to be scanned will be passed into your program from the command line. Your program should print out some helpful information to the output, and then write the number of times &ldquo;bunny&rdquo; occurs into a separate file. There are two parts to this&#x2014;scanning a single file, and then scanning through <i>all files</i> in a directory.
+</p>
+</div>
+
+<div id="outline-container-org3200871" class="outline-3">
+<h3 id="org3200871"><span class="section-number-3">3.1.</span> Part 1&#x2014;Single File</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+Run your bunny-scanning program with the <code>FirstFile.txt</code> and then <code>SecondFile.txt</code> and look at the outputs. Do they match with my output or what you expected it to be?
+</p>
+
+
+<div class="org-src-container">
+<pre class="src src-c">$&gt; python bunny.py FirstFile.txt
+In FirstFile.txt I counted bunny 1 times.
+</pre>
+</div>
+
+<p>
+Once this matches, then your program should write the number <code>1</code> to the file <code>FirstFile.out</code>. After running your program, printing out the contents of <code>FirstFile.out</code> (I am using the unix command <code>cat</code> to display the file contents) should look like below.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c">$&gt; cat FirstFile.out
+1
+</pre>
+</div>
+
+<p>
+The <code>cat</code> command will output the contents of a file to the command line. Do your results match?
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c">$&gt; python bunny.py SecondFile.txt
+In SecondFile.txt I counted bunny 4 times.
+</pre>
+</div>
+<p>
+The number <code>4</code> should then be written to <code>SecondFile.out</code>.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org2bbc288" class="outline-2">
+<h2 id="org2bbc288"><span class="section-number-2">4.</span> Second part</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+Now we will pass a directory to the bunny-counting program. When we pass a directory, for <i>each file inside the directory</i> that ends in <code>.txt</code>, you should look for &ldquo;bunny&rdquo; in the file. We do not need to worry about recursively descending through all the directories. Print out the number of times that &ldquo;bunny&rdquo; is in <i>all</i> the <code>.txt</code> files in the directory and then write your results to a <code>.out</code> file that is <i>inside the directory</i> with the name <code>&lt;directory name&gt;.out</code>, where you replace <code>&lt;directory name&gt;</code> with the name of the directory you scanned. An example will help this make more sense.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c">$&gt; python bunny.py ./hare/
+In ./hare/ I counted bunny 10 times.
+</pre>
+</div>
+
+<p>
+The number <code>10</code> should then be stored in a file named <code>./hare/hare.out</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c">$&gt; cat ./hare/hare.out
+10
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org575bd5f" class="outline-2">
+<h2 id="org575bd5f"><span class="section-number-2">5.</span> File Locations</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+You can download the files at
+<code>https://eg.bucknell.edu/~sjt015/eceg431/p55Items/p55Assignment/project5-5.zip</code>
+or
+this link: <a href="https://eg.bucknell.edu/~sjt015/eceg431/p55Items/p55Assignment/project5-5.zip">Project 5-5 zip file</a>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org17d17de" class="outline-2">
+<h2 id="org17d17de"><span class="section-number-2">6.</span> ZIP FILE CONTENTS</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+The zip file should could contain the following files:
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Stewart Thomas</p>
+<p class="date">Created: 2025-09-22 Mon 10:04</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

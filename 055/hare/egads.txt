@@ -1,0 +1,7 @@
+# egads.txt
+# this is a comment
+# Ignore this: bunny
+bunny
+rabbit
+bunny bunny
+Should output three.

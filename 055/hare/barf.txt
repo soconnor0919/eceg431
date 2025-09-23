@@ -1,0 +1,9 @@
+# barf.txt
+# this is a comment
+# Ignore this: bunny
+rabbit
+hare
+hare
+giraffe
+carrot
+The output is zero.
