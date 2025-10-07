@@ -5,8 +5,8 @@ import sys
 import os
 
 def count_bunny(filepath):
-    # Count "bunny" occurrences in a single file
-    # Skips comment lines and inline comments (anything after #)
+    # count "bunny" occurrences in a single file
+    # skips comment lines and inline comments (anything after #)
     count = 0
     with open(filepath, 'r') as f:
         for line in f:
