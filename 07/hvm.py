@@ -291,10 +291,10 @@ def translateVMFile(vmFile, asmFile):
 
 
 def main():
-    # translate VM directory to assembly
-    if len(sys.argv) != 2:
-        print("Usage: python hvm.py <directory>")
-        sys.exit(1)
+    # translate VM file or directory to assembly
+    # if len(sys.argv) != 2:
+    #     print("Usage: python hvm.py <file_or_directory>")
+    #     sys.exit(1)
 
     inputPath = sys.argv[1]
 
@@ -313,19 +313,24 @@ def main():
         print(f"Translated '{inputPath}' to '{outputFile}'")
 
     elif os.path.isdir(inputPath):
-        # directory mode
+        # directory mode - find VM file in directory
         vmFiles = [f for f in os.listdir(inputPath) if f.endswith('.vm')]
 
         if not vmFiles:
             print(f"Error: No .vm files found in directory '{inputPath}'")
             sys.exit(1)
 
-        # output file is dir name + .asm
+        # find VM file with same name as directory
         dirName = os.path.basename(inputPath.rstrip('/'))
-        outputFile = os.path.join(inputPath, dirName + '.asm')
+        vmFileName = dirName + '.vm'
 
-        # translate first VM file found
-        vmFile = os.path.join(inputPath, vmFiles[0])
+        if vmFileName in vmFiles:
+            vmFile = os.path.join(inputPath, vmFileName)
+        else:
+            # use first VM file found
+            vmFile = os.path.join(inputPath, vmFiles[0])
+
+        outputFile = os.path.join(inputPath, dirName + '.asm')
         translateVMFile(vmFile, outputFile)
         print(f"Translated '{vmFile}' to '{outputFile}'")
 
