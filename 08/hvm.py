@@ -1,5 +1,6 @@
-import sys
 import os
+import sys
+
 
 class Parser:
     # reads VM commands and breaks them into components
@@ -41,6 +42,18 @@ class Parser:
             return 'C_PUSH'
         elif command == 'pop':
             return 'C_POP'
+        elif command == 'label':
+            return 'C_LABEL'
+        elif command == 'goto':
+            return 'C_GOTO'
+        elif command == 'if-goto':
+            return 'C_IF'
+        elif command == 'function':
+            return 'C_FUNCTION'
+        elif command == 'call':
+            return 'C_CALL'
+        elif command == 'return':
+            return 'C_RETURN'
         else:
             return 'C_UNKNOWN'
 
@@ -52,8 +65,8 @@ class Parser:
             return self.current_command.split()[1]
 
     def arg2(self):
-        # extract second arg for push/pop
-        if self.commandType() in ['C_PUSH', 'C_POP']:
+        # extract second arg for push/pop/function/call
+        if self.commandType() in ['C_PUSH', 'C_POP', 'C_FUNCTION', 'C_CALL']:
             return int(self.current_command.split()[2])
         return None
 
@@ -66,6 +79,7 @@ class CodeWriter:
         self.output_file = open(output_file, 'w')
         self.label_counter = 0
         self.filename = None
+        self.current_function = None
 
     def setFileName(self, filename):
         # set current filename for static vars
@@ -268,14 +282,190 @@ class CodeWriter:
         self.output_file.write("@SP\n")
         self.output_file.write("M=M+1\n")
 
+    def writeInit(self):
+        # write bootstrap code
+        # set stack pointer to 256
+        self.output_file.write("// Bootstrap code\n")
+        self.output_file.write("@256\n")
+        self.output_file.write("D=A\n")
+        self.output_file.write("@SP\n")
+        self.output_file.write("M=D\n")
+        self.writeCall("Sys.init", 0)
+
+    def writeLabel(self, label):
+        # write label command
+        # uses function scope
+        # example: label LOOP -> (Main.test.LOOP)
+        if self.current_function:
+            self.output_file.write(f"({self.current_function}${label})\n")
+        else:
+            self.output_file.write(f"({label})\n")
+
+    def writeGoto(self, label):
+        # write goto command
+        # example: goto LOOP -> @Main.test.LOOP + 0;JMP
+        if self.current_function:
+            self.output_file.write(f"@{self.current_function}${label}\n")
+        else:
+            self.output_file.write(f"@{label}\n")
+        self.output_file.write("0;JMP\n")
+
+    def writeIf(self, label):
+        # write if-goto command
+        # jumps if D is not zero
+        # example: if-goto LOOP -> pop + @Main.test.LOOP + D;JNE
+        self.popToD()
+        if self.current_function:
+            self.output_file.write(f"@{self.current_function}${label}\n")
+        else:
+            self.output_file.write(f"@{label}\n")
+        self.output_file.write("D;JNE\n")
+
+    def writeCall(self, functionName, numArgs):
+        # write call command
+        returnLabel = f"RETURN_{self.label_counter}"
+        self.label_counter += 1
+
+        # push return address
+        self.output_file.write(f"@{returnLabel}\n")
+        self.output_file.write("D=A\n")
+        self.pushD()
+
+        # push LCL
+        self.output_file.write("@LCL\n")
+        self.output_file.write("D=M\n")
+        self.pushD()
+
+        # push ARG
+        self.output_file.write("@ARG\n")
+        self.output_file.write("D=M\n")
+        self.pushD()
+
+        # push THIS
+        self.output_file.write("@THIS\n")
+        self.output_file.write("D=M\n")
+        self.pushD()
+
+        # push THAT
+        self.output_file.write("@THAT\n")
+        self.output_file.write("D=M\n")
+        self.pushD()
+
+        # reposition ARG = SP - numArgs - 5
+        self.output_file.write("@SP\n")
+        self.output_file.write("D=M\n")
+        self.output_file.write(f"@{numArgs + 5}\n")
+        self.output_file.write("D=D-A\n")
+        self.output_file.write("@ARG\n")
+        self.output_file.write("M=D\n")
+
+        # reposition LCL = SP
+        self.output_file.write("@SP\n")
+        self.output_file.write("D=M\n")
+        self.output_file.write("@LCL\n")
+        self.output_file.write("M=D\n")
+
+        # goto function
+        self.output_file.write(f"@{functionName}\n")
+        self.output_file.write("0;JMP\n")
+
+        # set return label
+        self.output_file.write(f"({returnLabel})\n")
+
+    def writeFunction(self, functionName, numLocals):
+        # write function command
+        # create function entrypoint label
+        self.current_function = functionName
+        self.output_file.write(f"({functionName})\n")
+
+        # initialize local variables to 0
+        for i in range(numLocals):
+            self.output_file.write("@0\n")
+            self.output_file.write("D=A\n")
+            self.pushD()
+
+    def writeReturn(self):
+        # write return command
+        # FRAME = LCL
+        # save frame pointer
+        self.output_file.write("@LCL\n")
+        self.output_file.write("D=M\n")
+        self.output_file.write("@R13\n")  # use R13 as FRAME
+        self.output_file.write("M=D\n")
+
+        # RET = *(FRAME-5)
+        # extract return address from frame
+        self.output_file.write("@5\n")
+        self.output_file.write("A=D-A\n")
+        self.output_file.write("D=M\n")
+        self.output_file.write("@R14\n")  # use R14 as RET
+        self.output_file.write("M=D\n")
+
+        # *ARG = pop()
+        # set position of return val for caller
+        self.popToD()
+        self.output_file.write("@ARG\n")
+        self.output_file.write("A=M\n")
+        self.output_file.write("M=D\n")
+
+        # SP = ARG + 1
+        # restore caller stack pointer
+        self.output_file.write("@ARG\n")
+        self.output_file.write("D=M+1\n")
+        self.output_file.write("@SP\n")
+        self.output_file.write("M=D\n")
+
+        # restore caller segment pointers...
+
+        # restore THAT = *(FRAME-1)
+        self.output_file.write("@R13\n")
+        self.output_file.write("D=M\n")
+        self.output_file.write("@1\n")
+        self.output_file.write("A=D-A\n")
+        self.output_file.write("D=M\n")
+        self.output_file.write("@THAT\n")
+        self.output_file.write("M=D\n")
+
+        # restore THIS = *(FRAME-2)
+        self.output_file.write("@R13\n")
+        self.output_file.write("D=M\n")
+        self.output_file.write("@2\n")
+        self.output_file.write("A=D-A\n")
+        self.output_file.write("D=M\n")
+        self.output_file.write("@THIS\n")
+        self.output_file.write("M=D\n")
+
+        # restore ARG = *(FRAME-3)
+        self.output_file.write("@R13\n")
+        self.output_file.write("D=M\n")
+        self.output_file.write("@3\n")
+        self.output_file.write("A=D-A\n")
+        self.output_file.write("D=M\n")
+        self.output_file.write("@ARG\n")
+        self.output_file.write("M=D\n")
+
+        # restore LCL = *(FRAME-4)
+        self.output_file.write("@R13\n")
+        self.output_file.write("D=M\n")
+        self.output_file.write("@4\n")
+        self.output_file.write("A=D-A\n")
+        self.output_file.write("D=M\n")
+        self.output_file.write("@LCL\n")
+        self.output_file.write("M=D\n")
+
+        # goto RET
+        # jump back to caller
+        self.output_file.write("@R14\n")
+        self.output_file.write("A=M\n")
+        self.output_file.write("0;JMP\n")
+
     def close(self):
         self.output_file.close()
 
 
-def translateVMFile(vmFile, asmFile):
-    # translate single VM file to assembly
+def translateVMFile(vmFile, codeWriter):
+    # translate single VM file using existing code writer
     parser = Parser(vmFile)
-    codeWriter = CodeWriter(asmFile)
     codeWriter.setFileName(vmFile)
 
     while parser.hasMoreCommands():
@@ -286,17 +476,35 @@ def translateVMFile(vmFile, asmFile):
             codeWriter.writeArithmetic(parser.arg1())
         elif cmdType in ['C_PUSH', 'C_POP']:
             codeWriter.writePushPop(cmdType, parser.arg1(), parser.arg2())
-
-    codeWriter.close()
+        elif cmdType == 'C_LABEL':
+            codeWriter.writeLabel(parser.arg1())
+        elif cmdType == 'C_GOTO':
+            codeWriter.writeGoto(parser.arg1())
+        elif cmdType == 'C_IF':
+            codeWriter.writeIf(parser.arg1())
+        elif cmdType == 'C_FUNCTION':
+            codeWriter.writeFunction(parser.arg1(), parser.arg2())
+        elif cmdType == 'C_CALL':
+            codeWriter.writeCall(parser.arg1(), parser.arg2())
+        elif cmdType == 'C_RETURN':
+            codeWriter.writeReturn()
 
 
 def main():
     # translate VM file or directory to assembly
-    # if len(sys.argv) != 2:
-    #     print("Usage: python hvm.py <file_or_directory>")
-    #     sys.exit(1)
+    if len(sys.argv) < 2:
+        print("Usage: python hvm.py <file_or_directory> [-y|-n]")
+        sys.exit(1)
 
     inputPath = sys.argv[1]
+
+    # check for bootstrap flag
+    writeBootstrap = True
+    if len(sys.argv) > 2:
+        if sys.argv[2] == '-n':
+            writeBootstrap = False
+        elif sys.argv[2] == '-y':
+            writeBootstrap = True
 
     if not os.path.exists(inputPath):
         print(f"Error: Path '{inputPath}' not found")
@@ -309,30 +517,41 @@ def main():
             sys.exit(1)
 
         outputFile = inputPath[:-3] + '.asm'
-        translateVMFile(inputPath, outputFile)
+        codeWriter = CodeWriter(outputFile)
+
+        if writeBootstrap:
+            codeWriter.writeInit()
+
+        translateVMFile(inputPath, codeWriter)
+        codeWriter.close()
         print(f"Translated '{inputPath}' to '{outputFile}'")
 
     elif os.path.isdir(inputPath):
-        # directory mode - find VM file in directory
+        # directory mode - translate all VM files
         vmFiles = [f for f in os.listdir(inputPath) if f.endswith('.vm')]
 
         if not vmFiles:
             print(f"Error: No .vm files found in directory '{inputPath}'")
             sys.exit(1)
 
-        # find VM file with same name as directory
+        # sort files to ensure consistent order
+        vmFiles.sort()
+
+        # output file is directory name + .asm
         dirName = os.path.basename(inputPath.rstrip('/'))
-        vmFileName = dirName + '.vm'
-
-        if vmFileName in vmFiles:
-            vmFile = os.path.join(inputPath, vmFileName)
-        else:
-            # use first VM file found
-            vmFile = os.path.join(inputPath, vmFiles[0])
-
         outputFile = os.path.join(inputPath, dirName + '.asm')
-        translateVMFile(vmFile, outputFile)
-        print(f"Translated '{vmFile}' to '{outputFile}'")
+        codeWriter = CodeWriter(outputFile)
+
+        if writeBootstrap:
+            codeWriter.writeInit()
+
+        # translate all VM files
+        for vmFileName in vmFiles:
+            vmFile = os.path.join(inputPath, vmFileName)
+            translateVMFile(vmFile, codeWriter)
+
+        codeWriter.close()
+        print(f"Translated {len(vmFiles)} files to '{outputFile}'")
 
     else:
         print(f"Error: '{inputPath}' is neither file nor directory")
