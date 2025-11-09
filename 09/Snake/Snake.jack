@@ -1,0 +1,187 @@
+// Manages snake body segments and movement mechanics
+// Handles growth, collision detection, and rendering
+class Snake {
+    field Array body;
+    field int length;
+    field int maxLength;
+    field int direction;
+    field int size;
+    field Point head;
+
+    // create snake with initial length at center screen
+    constructor Snake new() {
+        let maxLength = 200;
+        let length = 3;
+        let size = 8;
+        let direction = 4; // right
+        let body = Array.new(maxLength);
+
+        // initialize head at screen center
+        let head = Point.new(256, 128);
+        let body[0] = head;
+
+        // create initial body segments
+        let body[1] = Point.new(248, 128);
+        let body[2] = Point.new(240, 128);
+
+        do draw();
+        return this;
+    }
+
+    // free memory
+    method void dispose() {
+        var int i;
+        var Point segment;
+
+        let i = 0;
+        while (i < length) {
+            let segment = body[i];
+            do segment.dispose();
+            let i = i + 1;
+        }
+        do body.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    // draw entire snake as solid squares
+    method void draw() {
+        var int i;
+        var Point segment;
+
+        do Screen.setColor(true);
+        let i = 0;
+        while (i < length) {
+            let segment = body[i];
+            do Screen.drawRectangle(segment.getX(), segment.getY(),
+                                  segment.getX() + size - 1, segment.getY() + size - 1);
+            let i = i + 1;
+        }
+        return;
+    }
+
+    // erase tail segment
+    method void eraseTail() {
+        var Point tail;
+        let tail = body[length - 1];
+        do Screen.setColor(false);
+        do Screen.drawRectangle(tail.getX(), tail.getY(),
+                              tail.getX() + size, tail.getY() + size);
+        return;
+    }
+
+    // move snake one step forward with optional growth
+    method void move(boolean grow) {
+        var int i;
+        var Point newHead;
+        var Point oldTail;
+        var int newX, newY;
+
+        // calculate new head position based on direction
+        let newX = head.getX();
+        let newY = head.getY();
+        if (direction = 1) { let newY = newY - 8; }   // up
+        if (direction = 2) { let newY = newY + 8; }   // down
+        if (direction = 3) { let newX = newX - 8; }   // left
+        if (direction = 4) { let newX = newX + 8; }   // right
+
+        // create new head first
+        let newHead = Point.new(newX, newY);
+
+        if (grow) {
+            // growing: shift everything back and add new head
+            let i = length;
+            while (i > 0) {
+                let body[i] = body[i - 1];
+                let i = i - 1;
+            }
+            let body[0] = newHead;
+            let head = newHead;
+            let length = length + 1;
+
+            // draw new head only
+            do Screen.setColor(true);
+            do Screen.drawRectangle(head.getX(), head.getY(),
+                                  head.getX() + size - 1, head.getY() + size - 1);
+        } else {
+            // not growing: move tail to front as new head
+            let oldTail = body[length - 1];
+
+            // erase old tail first
+            do Screen.setColor(false);
+            do Screen.drawRectangle(oldTail.getX(), oldTail.getY(),
+                                  oldTail.getX() + size - 1, oldTail.getY() + size - 1);
+
+            // shift body segments back
+            let i = length - 1;
+            while (i > 0) {
+                let body[i] = body[i - 1];
+                let i = i - 1;
+            }
+
+            // dispose old tail and use new head
+            do oldTail.dispose();
+            let body[0] = newHead;
+            let head = newHead;
+
+            // draw new head
+            do Screen.setColor(true);
+            do Screen.drawRectangle(head.getX(), head.getY(),
+                                  head.getX() + size - 1, head.getY() + size - 1);
+        }
+
+        return;
+    }
+
+    // change direction (prevent reverse moves)
+    method void setDirection(int newDirection) {
+        // prevent moving directly backwards
+        if (((direction = 1) & (newDirection = 2)) |  // up -> down
+            ((direction = 2) & (newDirection = 1)) |  // down -> up
+            ((direction = 3) & (newDirection = 4)) |  // left -> right
+            ((direction = 4) & (newDirection = 3))) { // right -> left
+            return;
+        }
+        let direction = newDirection;
+        return;
+    }
+
+    // check wall collision
+    method boolean hitWall() {
+        return (head.getX() < 8) | (head.getX() > 496) |
+               (head.getY() < 8) | (head.getY() > 240);
+    }
+
+    // check self collision
+    method boolean hitSelf() {
+        var int i;
+        var Point segment;
+
+        let i = 1; // skip head (index 0)
+        while (i < length) {
+            let segment = body[i];
+            if (head.equals(segment)) {
+                return true;
+            }
+            let i = i + 1;
+        }
+        return false;
+    }
+
+    // get head position
+    method Point getHead() {
+        return head;
+    }
+
+    // get current length
+    method int getLength() {
+        return length;
+    }
+
+    // get current direction
+    method int getDirection() {
+        return direction;
+    }
+
+
+}

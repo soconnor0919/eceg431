@@ -1,0 +1,93 @@
+// Manages food placement and collection for snake game
+// Handles random positioning and collision detection
+class Food {
+    field Point position;
+    field int size;
+    field boolean active;
+
+    // create food at random position
+    constructor Food new() {
+        let size = 8;
+        let active = false;
+        let position = Point.new(0, 0);
+        return this;
+    }
+
+    // free memory
+    method void dispose() {
+        do position.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    // place food at random grid position
+    method void spawn() {
+        var int gridX, gridY;
+
+        // generate random grid coordinates (8x8 pixel grid)
+        let gridX = Random.between(1, 58) * 8;
+        let gridY = Random.between(1, 28) * 8;
+
+        do position.setX(gridX);
+        do position.setY(gridY);
+        let active = true;
+        do draw();
+        return;
+    }
+
+    // draw food on screen as outlined box
+    method void draw() {
+        if (active) {
+            do drawOutlinedBox(position.getX(), position.getY(), size);
+        }
+        return;
+    }
+
+    // draw outlined box for food
+    method void drawOutlinedBox(int x, int y, int squareSize) {
+        do Screen.setColor(true);
+        // draw top and bottom borders
+        do Screen.drawRectangle(x, y, x + squareSize - 1, y);
+        do Screen.drawRectangle(x, y + squareSize - 1, x + squareSize - 1, y + squareSize - 1);
+
+        // draw left and right borders
+        do Screen.drawRectangle(x, y, x, y + squareSize - 1);
+        do Screen.drawRectangle(x + squareSize - 1, y, x + squareSize - 1, y + squareSize - 1);
+
+        return;
+    }
+
+    // remove food from screen
+    method void erase() {
+        do Screen.setColor(false);
+        do Screen.drawRectangle(position.getX(), position.getY(),
+                              position.getX() + size - 1, position.getY() + size - 1);
+        return;
+    }
+
+    // check if snake head collides with food
+    method boolean checkCollision(Point snakeHead) {
+        if (~active) {
+            return false;
+        }
+
+        // check if snake head overlaps food position
+        if ((snakeHead.getX() = position.getX()) &
+            (snakeHead.getY() = position.getY())) {
+            do erase();
+            let active = false;
+            return true;
+        }
+        return false;
+    }
+
+    // get current position
+    method Point getPosition() {
+        return position;
+    }
+
+    // check if food is currently active
+    method boolean isActive() {
+        return active;
+    }
+}

@@ -1,0 +1,18 @@
+// Snake Game - Entry Point
+// A classic Snake implementation with growing mechanics,
+// collision detection, scoring, and smooth gameplay
+class Main {
+    // program entry point
+    function void main() {
+        var SnakeGame game;
+
+        // create and start game
+        let game = SnakeGame.new();
+        do game.run();
+
+        // cleanup when done
+        do game.dispose();
+
+        return;
+    }
+}

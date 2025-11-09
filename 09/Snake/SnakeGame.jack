@@ -1,0 +1,209 @@
+// Main game controller for Snake
+// Handles input, game loop, scoring, and game state management
+class SnakeGame {
+    field Snake snake;
+    field Food food;
+    field int score;
+    field boolean gameOver;
+    field boolean paused;
+    field int speed;
+
+    // create new snake game
+    constructor SnakeGame new() {
+        let snake = Snake.new();
+        let food = Food.new();
+        do food.spawn(); // spawn food at random position
+        let score = 0;
+        let gameOver = false;
+        let paused = false;
+        let speed = 150; // milliseconds between moves
+
+        do Random.seed(123); // initialize random generator
+        do drawUI();
+        return this;
+    }
+
+    // free memory
+    method void dispose() {
+        do snake.dispose();
+        do food.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    // draw game interface elements
+    method void drawUI() {
+        // draw thick border for clear game boundaries
+        do Screen.setColor(true);
+        do Screen.drawRectangle(0, 0, 511, 7);     // top border
+        do Screen.drawRectangle(0, 248, 511, 255); // bottom border
+        do Screen.drawRectangle(0, 0, 7, 255);     // left border
+        do Screen.drawRectangle(504, 0, 511, 255); // right border
+
+        do showScore();
+        do showInstructions();
+        return;
+    }
+
+    // display current score
+    method void showScore() {
+        do Output.moveCursor(0, 0);
+        do Output.printString("Score: ");
+        do Output.printInt(score);
+        return;
+    }
+
+    // display game instructions
+    method void showInstructions() {
+        do Output.moveCursor(0, 20);
+        do Output.printString("Arrow Keys: Move  Space: Pause  Q: Quit");
+        return;
+    }
+
+    // display game over message
+    method void showGameOver() {
+        do Output.moveCursor(12, 20);
+        do Output.printString("GAME OVER!");
+        do Output.moveCursor(14, 18);
+        do Output.printString("Final Score: ");
+        do Output.printInt(score);
+        do Output.moveCursor(16, 15);
+        do Output.printString("Press R to restart or Q to quit");
+        return;
+    }
+
+    // handle user input
+    method void processInput() {
+        var char key;
+        let key = Keyboard.keyPressed();
+
+        if (key = 81) { let gameOver = true; }        // q - quit
+        if (key = 32) { let paused = ~paused; }       // space - pause
+        if (key = 131) { do snake.setDirection(1); }  // up arrow
+        if (key = 133) { do snake.setDirection(2); }  // down arrow
+        if (key = 130) { do snake.setDirection(3); }  // left arrow
+        if (key = 132) { do snake.setDirection(4); }  // right arrow
+
+        return;
+    }
+
+    // update game state one frame
+    method void update() {
+        var boolean ateFood;
+        var Point nextHead, currentHead;
+        var int nextX, nextY, currentDirection;
+
+        if (paused | gameOver) {
+            return;
+        }
+
+        // get current head and direction
+        let currentHead = snake.getHead();
+        let currentDirection = snake.getDirection();
+        let nextX = currentHead.getX();
+        let nextY = currentHead.getY();
+
+        // calculate next head position based on direction
+        if (currentDirection = 1) { let nextY = nextY - 8; }   // up
+        if (currentDirection = 2) { let nextY = nextY + 8; }   // down
+        if (currentDirection = 3) { let nextX = nextX - 8; }   // left
+        if (currentDirection = 4) { let nextX = nextX + 8; }   // right
+
+        let nextHead = Point.new(nextX, nextY);
+
+        // check food collision at next position
+        let ateFood = food.checkCollision(nextHead);
+        do nextHead.dispose();
+
+        // move snake (with or without growth)
+        do snake.move(ateFood);
+
+        // check collisions after movement
+        if (snake.hitWall() | snake.hitSelf()) {
+            let gameOver = true;
+            return;
+        }
+
+        // handle food consumption
+        if (ateFood) {
+            let score = score + 10;
+            do food.spawn();
+            do showScore();
+
+            // increase speed slightly
+            if (speed > 80) {
+                let speed = speed - 2;
+            }
+        }
+
+        return;
+    }
+
+    // wait for game restart input
+    method boolean waitForRestart() {
+        var char key;
+
+        while (true) {
+            let key = Keyboard.keyPressed();
+            if (key = 82) { // r key
+                return true;
+            }
+            if (key = 81) { // q key
+                return false;
+            }
+            do Sys.wait(50);
+        }
+        return false;
+    }
+
+    // main game loop
+    method void run() {
+        var boolean restart;
+
+        while (true) {
+            // game running loop
+            while (~gameOver) {
+                do processInput();
+                do update();
+                do Sys.wait(speed);
+            }
+
+            // game over screen
+            do showGameOver();
+            let restart = waitForRestart();
+
+            if (restart) {
+                // reset game state
+                do Screen.clearScreen();
+                do snake.dispose();
+                do food.dispose();
+                let snake = Snake.new();
+                let food = Food.new();
+                do food.spawn();
+                let score = 0;
+                let gameOver = false;
+                let paused = false;
+                let speed = 150;
+                do drawUI();
+            } else {
+                return; // quit game
+            }
+        }
+        return;
+    }
+
+    // get current score
+    method int getScore() {
+        return score;
+    }
+
+    // check if game is over
+    method boolean isGameOver() {
+        return gameOver;
+    }
+
+    // check if game is paused
+    method boolean isPaused() {
+        return paused;
+    }
+}

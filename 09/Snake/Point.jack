@@ -1,0 +1,56 @@
+// Simple coordinate class for clean position handling
+// Provides basic x,y operations for snake and food placement
+class Point {
+    field int x, y;
+
+    // create point at given coordinates
+    constructor Point new(int ax, int ay) {
+        let x = ax;
+        let y = ay;
+        return this;
+    }
+
+    // free memory
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    // get x coordinate
+    method int getX() {
+        return x;
+    }
+
+    // get y coordinate
+    method int getY() {
+        return y;
+    }
+
+    // update coordinates
+    method void setX(int newX) {
+        let x = newX;
+        return;
+    }
+
+    method void setY(int newY) {
+        let y = newY;
+        return;
+    }
+
+    // check if this point equals another
+    method boolean equals(Point other) {
+        return (x = other.getX()) & (y = other.getY());
+    }
+
+    // move point by offset
+    method void move(int dx, int dy) {
+        let x = x + dx;
+        let y = y + dy;
+        return;
+    }
+
+    // copy this point to new point
+    method Point copy() {
+        return Point.new(x, y);
+    }
+}
