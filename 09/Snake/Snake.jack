@@ -16,13 +16,13 @@ class Snake {
         let direction = 4; // right
         let body = Array.new(maxLength);
 
-        // initialize head at screen center
-        let head = Point.new(256, 128);
+        // initialize head at screen center (adjusted for header area)
+        let head = Point.new(256, 144);
         let body[0] = head;
 
         // create initial body segments
-        let body[1] = Point.new(248, 128);
-        let body[2] = Point.new(240, 128);
+        let body[1] = Point.new(248, 144);
+        let body[2] = Point.new(240, 144);
 
         do draw();
         return this;
@@ -146,10 +146,10 @@ class Snake {
         return;
     }
 
-    // check wall collision
+    // check wall collision (adjusted for header area)
     method boolean hitWall() {
         return (head.getX() < 8) | (head.getX() > 496) |
-               (head.getY() < 8) | (head.getY() > 240);
+               (head.getY() < 33) | (head.getY() > 240);
     }
 
     // check self collision

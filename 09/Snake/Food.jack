@@ -25,8 +25,9 @@ class Food {
         var int gridX, gridY;
 
         // generate random grid coordinates (8x8 pixel grid)
+        // adjusted for header area (y starts at 33, so grid starts at row 5)
         let gridX = Random.between(1, 58) * 8;
-        let gridY = Random.between(1, 28) * 8;
+        let gridY = Random.between(5, 28) * 8;
 
         do position.setX(gridX);
         do position.setY(gridY);

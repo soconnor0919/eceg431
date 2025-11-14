@@ -7,6 +7,9 @@ class SnakeGame {
     field boolean gameOver;
     field boolean paused;
     field int speed;
+    field char lastKey;
+    field int pendingDirection;
+    field boolean restarting;
 
     // create new snake game
     constructor SnakeGame new() {
@@ -17,6 +20,9 @@ class SnakeGame {
         let gameOver = false;
         let paused = false;
         let speed = 150; // milliseconds between moves
+        let lastKey = 0;
+        let pendingDirection = 0;
+        let restarting = false;
 
         do Random.seed(123); // initialize random generator
         do drawUI();
@@ -33,57 +39,133 @@ class SnakeGame {
 
     // draw game interface elements
     method void drawUI() {
-        // draw thick border for clear game boundaries
+        // draw header area with border only on third row
         do Screen.setColor(true);
-        do Screen.drawRectangle(0, 0, 511, 7);     // top border
+        do Screen.drawRectangle(0, 22, 511, 32);   // border only on third row
         do Screen.drawRectangle(0, 248, 511, 255); // bottom border
-        do Screen.drawRectangle(0, 0, 7, 255);     // left border
-        do Screen.drawRectangle(504, 0, 511, 255); // right border
+        do Screen.drawRectangle(0, 32, 7, 255);    // left border (starts below header)
+        do Screen.drawRectangle(504, 32, 511, 255); // right border (starts below header)
 
+        do showGameTitle();
         do showScore();
-        do showInstructions();
+        do showControls();
+        return;
+    }
+
+    // display game title
+    method void showGameTitle() {
+        do Output.moveCursor(0, 0);
+        do Output.printString("SNAKE GAME");
         return;
     }
 
     // display current score
     method void showScore() {
-        do Output.moveCursor(0, 0);
+        do Output.moveCursor(1, 0);
         do Output.printString("Score: ");
         do Output.printInt(score);
         return;
     }
 
-    // display game instructions
-    method void showInstructions() {
-        do Output.moveCursor(0, 20);
-        do Output.printString("Arrow Keys: Move  Space: Pause  Q: Quit");
+    // display game controls
+    method void showControls() {
+        do Output.moveCursor(0, 35);
+        do Output.printString("Arrows: Move  Space: Pause");
+        do Output.moveCursor(1, 35);
+        do Output.printString("Enter: 2x Speed  R: Restart");
         return;
     }
 
     // display game over message
     method void showGameOver() {
-        do Output.moveCursor(12, 20);
+        // draw larger border box (centered on screen)
+        do Screen.setColor(true);
+        do Screen.drawRectangle(100, 80, 412, 180);  // outer border
+        do Screen.setColor(false);
+        do Screen.drawRectangle(102, 82, 410, 178);  // inner area
+
+        // properly centered text
+        // Box spans columns 12-51 (39 chars wide), center at column 31
+        do Output.moveCursor(10, 26);  // "GAME OVER!" (10 chars) centered at 31-5=26
         do Output.printString("GAME OVER!");
-        do Output.moveCursor(14, 18);
+        do Output.moveCursor(12, 23);  // "Final Score: XXX" (~16 chars) centered at 31-8=23
         do Output.printString("Final Score: ");
         do Output.printInt(score);
-        do Output.moveCursor(16, 15);
+        do Output.moveCursor(14, 15);  // "Press R to restart or Q to quit" (32 chars) at 31-16=15
         do Output.printString("Press R to restart or Q to quit");
         return;
     }
 
-    // handle user input
+    // handle user input with key press detection
     method void processInput() {
         var char key;
         let key = Keyboard.keyPressed();
 
-        if (key = 81) { let gameOver = true; }        // q - quit
-        if (key = 32) { let paused = ~paused; }       // space - pause
-        if (key = 131) { do snake.setDirection(1); }  // up arrow
-        if (key = 133) { do snake.setDirection(2); }  // down arrow
-        if (key = 130) { do snake.setDirection(3); }  // left arrow
-        if (key = 132) { do snake.setDirection(4); }  // right arrow
+        // only process if this is a new key press (different from last frame)
+        if ((key > 0) & (~(key = lastKey))) {
+            if (key = 81) { let gameOver = true; }        // q - quit
+            if (key = 32) { let paused = ~paused; }       // space - pause
+            if ((key = 82) & (~restarting)) {             // r - restart anytime (prevent rapid calls)
+                let restarting = true;
+                do restart();
+                return;
+            }
+            if (key = 131) { let pendingDirection = 1; }  // up arrow - queue for next frame
+            if (key = 133) { let pendingDirection = 2; }  // down arrow - queue for next frame
+            if (key = 130) { let pendingDirection = 3; }  // left arrow - queue for next frame
+            if (key = 132) { let pendingDirection = 4; }  // right arrow - queue for next frame
+        }
 
+        let lastKey = key;
+        return;
+    }
+
+    // get current speed based on whether shift is held
+    method int getCurrentSpeed() {
+        var char key;
+        let key = Keyboard.keyPressed();
+
+        if (key = 128) { // enter key
+            return speed / 2; // 2x speed when enter held
+        }
+        return speed;
+    }
+
+    // restart the game
+    method void restart() {
+        do Screen.clearScreen();
+        do snake.dispose();
+        do food.dispose();
+        let snake = Snake.new();
+        let food = Food.new();
+        do food.spawn();
+        let score = 0;
+        let gameOver = false;
+        let paused = false;
+        let speed = 150;
+        let lastKey = 0;
+        let pendingDirection = 0;
+        let restarting = false;
+        do drawUI();
+        return;
+    }
+
+    // check for input multiple times during wait period
+    method void waitWithInput(int milliseconds) {
+        var int elapsed;
+        var int checkInterval;
+
+        let elapsed = 0;
+        let checkInterval = 20; // check input every 20ms
+
+        while (elapsed < milliseconds) {
+            do processInput();
+            if (gameOver) {
+                return;
+            }
+            do Sys.wait(checkInterval);
+            let elapsed = elapsed + checkInterval;
+        }
         return;
     }
 
@@ -95,6 +177,12 @@ class SnakeGame {
 
         if (paused | gameOver) {
             return;
+        }
+
+        // apply pending direction change at start of frame
+        if (pendingDirection > 0) {
+            do snake.setDirection(pendingDirection);
+            let pendingDirection = 0;
         }
 
         // get current head and direction
@@ -119,6 +207,7 @@ class SnakeGame {
         do snake.move(ateFood);
 
         // check collisions after movement
+        // check wall collision (adjusted for new header area)
         if (snake.hitWall() | snake.hitSelf()) {
             let gameOver = true;
             return;
@@ -163,9 +252,8 @@ class SnakeGame {
         while (true) {
             // game running loop
             while (~gameOver) {
-                do processInput();
                 do update();
-                do Sys.wait(speed);
+                do waitWithInput(getCurrentSpeed());
             }
 
             // game over screen
@@ -173,18 +261,7 @@ class SnakeGame {
             let restart = waitForRestart();
 
             if (restart) {
-                // reset game state
-                do Screen.clearScreen();
-                do snake.dispose();
-                do food.dispose();
-                let snake = Snake.new();
-                let food = Food.new();
-                do food.spawn();
-                let score = 0;
-                let gameOver = false;
-                let paused = false;
-                let speed = 150;
-                do drawUI();
+                do restart();
             } else {
                 return; // quit game
             }
