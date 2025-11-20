@@ -241,13 +241,13 @@ class CompilationEngine:
 
     def writeOpenTag(self, tag):
         # write opening XML tag
-        self.output.write("  " * self.indent + f"<{tag}>\n")
+        self.output.write("  " * self.indent + f"<{tag}>\r\n")
         self.indent += 1
 
     def writeCloseTag(self, tag):
         # write closing XML tag
         self.indent -= 1
-        self.output.write("  " * self.indent + f"</{tag}>\n")
+        self.output.write("  " * self.indent + f"</{tag}>\r\n")
 
     def writeTerminal(self, tag, value):
         # write terminal (token) XML element
@@ -261,7 +261,7 @@ class CompilationEngine:
         elif value == "&":
             value = "&amp;"
 
-        self.output.write("  " * self.indent + f"<{tag}> {value} </{tag}>\n")
+        self.output.write("  " * self.indent + f"<{tag}> {value} </{tag}>\r\n")
 
     def writeCurrentToken(self):
         # write current token as XML
@@ -456,7 +456,10 @@ class CompilationEngine:
         self.writeOpenTag("statements")
 
         # process statements
-        while self.tokenizer.keyword() in ["let", "if", "while", "do", "return"]:
+        while (
+            self.tokenizer.getTokenType() == "KEYWORD"
+            and self.tokenizer.keyword() in ["let", "if", "while", "do", "return"]
+        ):
             keyword = self.tokenizer.keyword()
 
             if keyword == "let":
@@ -469,8 +472,6 @@ class CompilationEngine:
                 self.compileDo()
             elif keyword == "return":
                 self.compileReturn()
-
-            self.tokenizer.advance()
 
         self.writeCloseTag("statements")
 
@@ -510,6 +511,7 @@ class CompilationEngine:
         self.writeCurrentToken()
 
         self.writeCloseTag("letStatement")
+        self.tokenizer.advance()
 
     def compileIf(self):
         # compile if statement
@@ -556,10 +558,7 @@ class CompilationEngine:
 
             # closing brace
             self.writeCurrentToken()
-        else:
-            # no else, back up
-            return
-
+            self.tokenizer.advance()
         self.writeCloseTag("ifStatement")
 
     def compileWhile(self):
@@ -592,6 +591,7 @@ class CompilationEngine:
         self.writeCurrentToken()
 
         self.writeCloseTag("whileStatement")
+        self.tokenizer.advance()
 
     def compileDo(self):
         # compile do statement
@@ -630,6 +630,7 @@ class CompilationEngine:
         self.writeCurrentToken()
 
         self.writeCloseTag("doStatement")
+        self.tokenizer.advance()
 
     def compileReturn(self):
         # compile return statement
@@ -648,6 +649,7 @@ class CompilationEngine:
         self.writeCurrentToken()
 
         self.writeCloseTag("returnStatement")
+        self.tokenizer.advance()
 
     def compileExpression(self):
         # compile expression
@@ -775,7 +777,7 @@ def analyzeFile(jackFile, outputFile, tokenizeOnly=False):
     if tokenizeOnly:
         # tokenizer test output
         output = open(outputFile, "w")
-        output.write("<tokens>\n")
+        output.write("<tokens>\r\n")
 
         while tokenizer.hasMoreTokens():
             tokenizer.advance()
@@ -783,7 +785,7 @@ def analyzeFile(jackFile, outputFile, tokenizeOnly=False):
 
             if tokenType == "KEYWORD":
                 value = tokenizer.keyword()
-                output.write(f"<keyword> {value} </keyword>\n")
+                output.write(f"<keyword> {value} </keyword>\r\n")
             elif tokenType == "SYMBOL":
                 value = tokenizer.symbol()
                 # escape special characters
@@ -795,18 +797,18 @@ def analyzeFile(jackFile, outputFile, tokenizeOnly=False):
                     value = "&quot;"
                 elif value == "&":
                     value = "&amp;"
-                output.write(f"<symbol> {value} </symbol>\n")
+                output.write(f"<symbol> {value} </symbol>\r\n")
             elif tokenType == "IDENTIFIER":
                 value = tokenizer.identifier()
-                output.write(f"<identifier> {value} </identifier>\n")
+                output.write(f"<identifier> {value} </identifier>\r\n")
             elif tokenType == "INT_CONST":
                 value = tokenizer.intVal()
-                output.write(f"<integerConstant> {value} </integerConstant>\n")
+                output.write(f"<integerConstant> {value} </integerConstant>\r\n")
             elif tokenType == "STRING_CONST":
                 value = tokenizer.stringVal()
-                output.write(f"<stringConstant> {value} </stringConstant>\n")
+                output.write(f"<stringConstant> {value} </stringConstant>\r\n")
 
-        output.write("</tokens>\n")
+        output.write("</tokens>\r\n")
         output.close()
     else:
         # full compilation
@@ -817,12 +819,11 @@ def analyzeFile(jackFile, outputFile, tokenizeOnly=False):
 
 def main():
     # analyze Jack file or directory
-    if len(sys.argv) < 2:
-        print("Usage: python JackAnalyzer.py <file_or_directory> [-t]")
+    if len(sys.argv) != 2:
+        print("Usage: python hjc.py <file_or_directory>")
         sys.exit(1)
 
     inputPath = sys.argv[1]
-    tokenizeOnly = len(sys.argv) > 2 and sys.argv[2] == "-t"
 
     if not os.path.exists(inputPath):
         print(f"Error: Path '{inputPath}' not found")
@@ -834,13 +835,17 @@ def main():
             print("Error: Input file must have .jack extension")
             sys.exit(1)
 
-        if tokenizeOnly:
-            outputFile = inputPath[:-5] + "T.xml"
-        else:
-            outputFile = inputPath[:-5] + ".xml"
+        # Generate tokenizer output
+        tokenizerFile = inputPath[:-5] + "T.xml"
+        analyzeFile(inputPath, tokenizerFile, True)
 
-        analyzeFile(inputPath, outputFile, tokenizeOnly)
-        print(f"Analyzed '{inputPath}' to '{outputFile}'")
+        # Generate parser output
+        parserFile = inputPath[:-5] + ".xml"
+        analyzeFile(inputPath, parserFile, False)
+
+        print(
+            f"Analyzed '{inputPath}' - generated '{tokenizerFile}' and '{parserFile}'"
+        )
 
     elif os.path.isdir(inputPath):
         # directory mode
@@ -853,13 +858,15 @@ def main():
         for jackFile in jackFiles:
             inputFile = os.path.join(inputPath, jackFile)
 
-            if tokenizeOnly:
-                outputFile = os.path.join(inputPath, jackFile[:-5] + "T.xml")
-            else:
-                outputFile = os.path.join(inputPath, jackFile[:-5] + ".xml")
+            # Generate tokenizer output
+            tokenizerFile = os.path.join(inputPath, jackFile[:-5] + "T.xml")
+            analyzeFile(inputFile, tokenizerFile, True)
 
-            analyzeFile(inputFile, outputFile, tokenizeOnly)
-            print(f"Analyzed '{inputFile}' to '{outputFile}'")
+            # Generate parser output
+            parserFile = os.path.join(inputPath, jackFile[:-5] + ".xml")
+            analyzeFile(inputFile, parserFile, False)
+
+        print(f"Analyzed {len(jackFiles)} files in '{inputPath}'")
 
     else:
         print(f"Error: '{inputPath}' is neither file nor directory")
