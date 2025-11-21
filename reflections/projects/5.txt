@@ -1,0 +1,17 @@
+I say this each time, but this one was definitely the hardest so far. Glad to be done with HDL. The Computer was easiest- just combining three parts. Memory was simple enough once I laid it out, using the textbook to figure out offsets and partitions. I'm not a fan of bit splitting (referencing like it's an array), but it's good enough to work. Partly why I'm glad to move on.
+
+That being said, the CPU was difficult.
+*extra lines for dramatic effect*
+
+Decoding instruction type? fine.
+Computing jump type? fine, eventually.
+Updating the program counter? fine. easy, even.
+Connecting outputs? didn't know I could just reroute outputs- until I looked at my old code and realized I doubled it anyways. Bit of an airhead moment from me, I just forced it with an or. Worked, but at what cost? (I know the cost. two or's. that's literally the cost.) ¯\_(ツ)_/¯
+
+ALU op? Lots of variables. But I made the ALU before- it's just plugging it in correctly.
+
+The problem was taking the instruction and turning it into something the ALU could handle. Even though I had the instruction breakdown, and the connections, I just repeatedly hit my head against a wall. It really took a lot of trial and error, but I had the majority of this all done in the first two days, and spent the rest of the time on fixing this. Eventually, I just kinda fixed it by accident? (In the words of Ned Ladd: There are three steps to solving a problem. Write down what you know, Think really hard, Write down the answer. You're at step 2.)
+
+In actuality, I drew out diagrams, connected the bit segments to where they needed to go, unraveled the mess of drawings I did create over and over, until I actually figured it out. Then it worked. But that isn't as fun of a response.
+
+Thank you for coming to my ted talk.

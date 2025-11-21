@@ -1,0 +1,8 @@
+Combining a reflection of 5.5 and 6 here...
+
+I began the bunny/hare project recalling how to program with Python. I looked back at my CSCI 204 labs to find how I had worked with file I/O, and copied functions from that to start. I prefer to work in heavily object oriented, strongly typed languages with less room for experimentation, so going back to Python feels very odd. Once I got file I/O and lists working, the program was fairly straightforward.
+
+Moving onto the assembler, I heavily utilized the template. I broke the program up into three classes: A parser, which reads the assembly commands and breaks them up into components; a symbol table, which acted as a lookup table for predefined symbols (registers, screen, keyboard etc), and a "code" class, which translates the mnemonics into their respective binary representations. Once those helpers were done, I began on the assembler. I store all the assembly that's generated into a list, which is later written to a file. Not the best implementation- more file writes would be safer, but this works for now, and lets me iterate.
+I check for more commands, iterate through the commands, find their type, then either look it up or convert to binary (this is simplified, but gets the gist). once all commands are processed, I write the list to the file.
+
+That's it! This took a bit of time, I optimized my classes a bit out of preference, but it works!
