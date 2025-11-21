@@ -1,0 +1,20 @@
+What points were the most clear to you? (List up to 3)
+
+- Jack syntax is pretty straightforward- Java-ish but simplified, which makes sense
+- OOP concepts translate well, even on this basic platform
+- The standard library provides the building blocks we need for larger programs
+Grading comment:
+What points were the muddiest and you'd like to talk more about? (List up to 3)
+
+- Memory management seems manual- are we doing our own malloc/free equivalent?
+- Graphics programming at this level feels primitive…
+- How do we debug Jack programs effectively without proper debugging tools?
+Grading comment:
+Reflect on what you read.
+Give me a sense about what is connecting to existing knowledge
+-OR-
+Your "ah ha!" moments
+-OR-
+What is hanging off by itself, not connecting.
+
+Finally! We're at the application layer- this is where it all comes together. After building everything from NAND gates to a VM, we can actually write real programs that do useful things. The Jack language feels like a stripped-down Java, which makes sense given my background. It's cool to see how OOP concepts work even on this simple platform. I’m now realizing that I’ve built a complete computing stack. We went from basic logic gates to writing applications with graphics and user interaction- insane when you think about it. Every layer we built is now being used - the ALU for calculations, memory for storage, the screen for output. What still bugs me is the realization that this is still pretty primitive compared to modern development. No garbage collection, limited graphics, basic I/O. But I know that's the point- I understand what's happening under the hood now. When I write programs normally, there are so many layers of abstraction I never think about.

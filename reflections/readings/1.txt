@@ -1,0 +1,18 @@
+What points were the most clear to you? (List up to 3)
+
+- Fundamentals of logic gates (or, and, not) made sense.
+- Explaining how a NAND gate can make up the three fundamentals made sense.
+Grading comment:
+What points were the muddiest and you'd like to talk more about? (List up to 3)
+
+- The idea of how a multiplexer functions makes sense, but its building blocks were kinda fuzzy (required external research).
+- Same with a demultiplexer, but I have a better understanding now.
+Grading comment:
+Reflect on what you read.
+Give me a sense about what is connecting to existing knowledge
+-OR-
+Your "ah ha!" moments
+-OR-
+What is hanging off by itself, not connecting.
+
+The concepts of chapter 1 felt relatively simple. I understood logic gates and truth tables because of my prior courses, namely discrete math. The snippets of HDL and API descriptions also made a lot of sense to me, as I work on more complex API structures and took CSCI 306 with assembly covered. The idea of this course is exciting- I’ve worked on every individual segment before, but never have I gone from the fundamentals to a complete product. There’s usually layers of abstraction in my projects- working with existing frameworks, or stopping at a level where I show proficiency for a class assignment.

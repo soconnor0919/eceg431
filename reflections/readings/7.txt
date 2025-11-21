@@ -1,0 +1,21 @@
+What points were the most clear to you? (List up to 3)
+
+- The concept of a VM (I work with Java a ton, this made sense)
+- Two-tiered architecture (translation between code and byte code, and another between byte code to machine language)
+- Push and pop, the stack, eventually a heap (I guess not?)
+Grading comment:
+What points were the muddiest and you'd like to talk more about? (List up to 3)
+
+- Why are we using a VM here? Isn’t that inefficient? Shouldn’t we be emulating something C-like instead of Java-like? Java is sloooow.
+- Again, as I read more- why a VM? This is just an extra layer! We’re not going for cross compatibility here, this is a weak machine!
+Grading comment:
+Reflect on what you read.
+Give me a sense about what is connecting to existing knowledge
+-OR-
+Your "ah ha!" moments
+-OR-
+What is hanging off by itself, not connecting.
+
+I’m definitely (not) biased here. My software engineering brain has one of those rotating police sirens going off. Why a VM? That’s super inefficient here. We have a low power computer, we’re not optimizing for cross-platform code compatibility, we’re not even using a standard architecture! So why are we using this? To me, this looks like a useless intermediary step that exists just to complicate things.
+
+That being said, learning about a VM language is a different story. And that’s how I’m rationalizing this seemingly bad decision. If this VM exists to teach us about programming language design, fine. But that’s better left for CSCI 308.

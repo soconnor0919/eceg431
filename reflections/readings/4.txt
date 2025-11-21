@@ -1,0 +1,19 @@
+What points were the most clear to you? (List up to 3)
+
+- Machine language is familiar, however the flavor is not.
+- working with memory, memory vs data reg, loop/jump
+Grading comment:
+What points were the muddiest and you'd like to talk more about? (List up to 3)
+
+- Back to assembly… can we not? (kidding, but also not really.)
+- Input/Output- we have predefined registers out of the ram range?
+- Working with the screen seems intimidating- we’ll see how that goes. Any tips would be appreciated.
+Grading comment:
+Reflect on what you read.
+Give me a sense about what is connecting to existing knowledge
+-OR-
+Your "ah ha!" moments
+-OR-
+What is hanging off by itself, not connecting.
+
+As with project03, this project with assembly language is starting to overlap with CSCI 306- working with assembly. Although I didn’t necessarily like that part of the course, I understand it, and I’m hoping that will overlap now. The only problem I see myself facing in the near future is shedding my RISCV assembly tendencies and learning hack, which seems to have weird syntax comparatively. Otherwise, the instructions from a high level here make sense and appear to be straightforward.

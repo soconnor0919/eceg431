@@ -1,0 +1,19 @@
+What points were the most clear to you? (List up to 3)
+
+- Okay, so we’re going up a step. We made the VM turn into Hack ASM, but we need something to make the VM language files in the first place- we’re not writing direct to VM.
+- So we’re translating Jack (java-ish) to VM! New syntax to learn, but it’s only 8 library files. That sounds doable.
+- The “calling protocol” makes sense- similar to the call stack I’m used to.
+Grading comment:
+What points were the muddiest and you'd like to talk more about? (List up to 3)
+
+- Again- VM bad, extra obscurity! Good for education.
+- how do we really define functions? That’s the library stuff I don’t quite get yet.
+Grading comment:
+Reflect on what you read.
+Give me a sense about what is connecting to existing knowledge
+-OR-
+Your "ah ha!" moments
+-OR-
+What is hanging off by itself, not connecting.
+
+We’re going up in the CS course stack! This time, a mix of 306 and 308 - computer systems, and programming language design. I understand how we are using functions now- converting a user-friendly programming language, to a vm intermediary, then compiling to assembly. This makes sense, and is exactly what I wanted to see in the course! I wanted to see this higher level connection of language to compiler to compiled- the VM step, no matter how much I disagree with it, is nice too.

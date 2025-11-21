@@ -1,0 +1,20 @@
+What points were the most clear to you? (List up to 3)
+
+- Tokenization makes sense- breaking code into symbols, keywords, identifiers
+- Okay, parsing follows the grammar structure naturally
+- The XML output is just a way to visualize the parse tree structure
+Grading comment:
+What points were the muddiest and you'd like to talk more about? (List up to 3)
+
+- Why XML output instead of just building the parse tree directly in some sort of object/other format
+- The LL(0) grammar thing - seems like we're deliberately making Jack simple to avoid lookahead  (tokenization again! like AI!!!)
+- How do we handle operator precedence if Jack doesn't enforce it? Lots of parentheses?
+Grading comment:
+Reflect on what you read.
+Give me a sense about what is connecting to existing knowledge
+-OR-
+Your "ah ha!" moments
+-OR-
+What is hanging off by itself, not connecting.
+
+This chapter shows how compilers work under the hood- tokenization breaks source code into basic elements, then recursive descent parsing follows grammar rules to build a parse tree. The XML output is just a demonstration tool to show the parser understands the program structure. This connects to my discrete math course- the grammars finally have a practical application beyond theory (finally! theory into practice! I thought this day would never come.). The LL(0) grammar design makes sense from an implementation perspective, though it feels wrong compared to real languages. Jack's deliberate simplifications (mandatory keywords, no operator precedence, forced curly braces) are clearly intended to make compiler construction easier to learn, but it ends up with a clunky syntax that I definitely wouldn't want to use in practice. Still, breaking this complex topic into manageable pieces (tokenizer + parser) makes a ton of sense.

@@ -1,0 +1,17 @@
+What points were the most clear to you? (List up to 3)
+
+- The concept of binary addition, and subsequent operations
+- Differences between a half and full adder, and how to connect them
+Grading comment:
+What points were the muddiest and you'd like to talk more about? (List up to 3)
+
+- The idea of an ALU made sense, but the concept of implementation was a little dense. I understand it now after working on the project for a bit.
+Grading comment:
+Reflect on what you read.
+Give me a sense about what is connecting to existing knowledge
+-OR-
+Your "ah ha!" moments
+-OR-
+What is hanging off by itself, not connecting.
+
+As with the prior chapter, this felt like review of CSCI 306- where we went over integer/binary addition, subtraction, etc. The idea of an ALU was touched on, but I feel like this is going to diverge a bit here- less in theory, more of implementation in this course. Again, I’m excited to see where this goes.
