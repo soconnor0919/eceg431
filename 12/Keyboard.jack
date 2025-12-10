@@ -10,7 +10,7 @@ class Keyboard {
     /** Initializes the keyboard. */
     function void init() {
         return;
-    } 
+    }
 
     /**
      * Returns the character of the currently pressed key on the keyboard;
@@ -37,35 +37,30 @@ class Keyboard {
     }
 
     /**	Waits until a key is pressed on the keyboard and released,
-     *  then echoes the key to the screen, and returns the character 
+     *  then echoes the key to the screen, and returns the character
      *  of the pressed key. */
     function char readChar() {
         var char key;
-        
+
         // Wait for key press
         while (Keyboard.keyPressed() = 0) {}
-        
+
         let key = Keyboard.keyPressed();
-        
+
         // Wait for release
         while (~(Keyboard.keyPressed() = 0)) {}
-        
+
         // Echo (except backspace)
         if (key < 129) {
              // Handle newline specially for cleaner output?
-             // Output.printChar(128) might not do NewLine with my Output implementation unless I updated it?
-             // My Output implementation (Step 240) does NOT check for 128.
-             // So I should call println() if 128.
              if (key = 128) {
                  do Output.println();
              } else {
                  do Output.printChar(key);
              }
         }
-        // If key > 129 (arrows etc), printChar might print garbage or square. 
-        // Spec usually implies echoing everything or being selective.
-        // I'll stick to echoing only standard chars + newline.
-            
+        // If key > 129 (arrows etc), printChar might print garbage or square.
+
         return key;
     }
 
@@ -75,24 +70,24 @@ class Keyboard {
     function String readLine(String message) {
         var String s;
         var char c;
-        
+
         do Output.printString(message);
         let s = String.new(64); // Assume max line 64
-        
+
         while (true) {
             let c = Keyboard.readChar();
-            
+
             if (c = 128) { // Newline
                 do Output.println();
                 return s;
             }
-            
+
             if (c = 129) { // Backspace
                 if (s.length() > 0) {
                     do s.eraseLastChar();
                     do Output.backSpace();
                     // Erase not supported by Output, so we print space and back up again?
-                    // But printChar sends cursor forward. 
+                    // But printChar sends cursor forward.
                     // To visually erase: Backspace (move left), Print Space (overwrite, move right), Backspace (move left).
                     // My output implementation doesn't support 'erasing' naturally.
                     // But this trick works.
@@ -104,7 +99,7 @@ class Keyboard {
             }
         }
         return s;
-    }   
+    }
 
     /** Displays the message on the screen, reads from the keyboard the entered
      *  text until a newline character is detected, echoes the text to the screen,
@@ -113,11 +108,11 @@ class Keyboard {
     function int readInt(String message) {
         var String s;
         var int val;
-        
+
         let s = Keyboard.readLine(message);
         let val = s.intValue();
         do s.dispose();
-        
+
         return val;
     }
 }

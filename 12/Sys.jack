@@ -10,8 +10,11 @@ class Sys {
 
     /** Performs all the initializations required by the OS. */
     function void init() {
+        // do Memory.poke(8000, 1); // Start
         do Memory.init();
+        // do Memory.poke(8000, 2); // Mem init done
         do Math.init();
+        // do Memory.poke(8000, 3); // Math init done
         do Screen.init();
         do Output.init();
         do Keyboard.init();
@@ -35,10 +38,8 @@ class Sys {
              let j = 0;
              // Calibration: loop count determines delay.
              // On typical VM emulator settings (Fast), ~50-100 loops might be 1ms?
-             // User requested 2 seconds wait in test.
              // "WaitWithInput" sample in Snake used loop for waiting.
              
-             // Standard N2T value is roughly 50-100.
              while (j < 50) {
                  let j = j + 1;
              }
